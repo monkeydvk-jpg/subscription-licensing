@@ -150,10 +150,16 @@ async def validate_license(
 @app.get("/api/health")
 async def health_check():
     """Health check endpoint."""
+    from .config import settings
+    db_url = settings.effective_database_url
+    db_type = "PostgreSQL" if "postgres" in db_url else "SQLite"
+    
     return {
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat(),
-        "version": settings.app_version
+        "version": settings.app_version,
+        "database_type": db_type,
+        "database_url_preview": db_url[:50] + ("..." if len(db_url) > 50 else "")
     }
 
 
