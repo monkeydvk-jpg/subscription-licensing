@@ -75,7 +75,7 @@ class Settings(BaseSettings):
     
     # Application
     app_name: str = "Extension License Manager"
-    app_version: str = "1.0.0"
+    app_version: str = "1.0.1"
     
     # License settings
     license_key_length: int = 32
