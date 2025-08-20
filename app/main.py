@@ -157,6 +157,28 @@ async def health_check():
     }
 
 
+@app.get("/api/debug/db-env")
+async def debug_db_env():
+    """Debug endpoint to check database environment."""
+    import os
+    from .config import settings
+    
+    db_url = settings.effective_database_url
+    db_type = "PostgreSQL" if "postgres" in db_url else "SQLite"
+    
+    env_vars = {
+        key: value
+        for key, value in os.environ.items()
+        if key.upper().startswith(("DATABASE", "POSTGRES"))
+    }
+    
+    return {
+        "effective_database_url": db_url,
+        "database_type": db_type,
+        "environment_variables": env_vars,
+    }
+
+
 # Admin Authentication
 @app.post("/api/admin/login", response_model=Token)
 async def admin_login(
