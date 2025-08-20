@@ -9,6 +9,14 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     # Database
     database_url: str = "sqlite:///./subscriptions.db"
+    postgres_url: Optional[str] = None  # For Vercel Postgres
+    
+    @property
+    def effective_database_url(self) -> str:
+        """Get the effective database URL, preferring PostgreSQL if available."""
+        if self.postgres_url:
+            return self.postgres_url
+        return self.database_url
     
     # Security
     secret_key: str = "your-secret-key-change-this-in-production"

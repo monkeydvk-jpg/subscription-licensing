@@ -7,10 +7,13 @@ from sqlalchemy.orm import sessionmaker
 
 from .config import settings
 
+# Get the effective database URL
+DATABASE_URL = settings.effective_database_url
+
 # Create database engine
 engine = create_engine(
-    settings.database_url,
-    connect_args={"check_same_thread": False} if "sqlite" in settings.database_url else {}
+    DATABASE_URL,
+    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
 )
 
 # Create session factory

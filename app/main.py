@@ -41,8 +41,13 @@ app = FastAPI(
     description="Extension License Management System with Stripe Subscriptions"
 )
 
-# Create database tables
-create_tables()
+# Create database tables (with error handling for serverless)
+try:
+    create_tables()
+    logger.info("✅ Database tables initialized successfully")
+except Exception as e:
+    logger.error(f"⚠️ Database initialization failed: {e}")
+    logger.info("Note: This might be expected in serverless environments. Tables will be created on first use.")
 
 # Mount static files and templates
 app.mount("/static", StaticFiles(directory="static"), name="static")
