@@ -10,12 +10,28 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "sqlite:///./subscriptions.db"
     postgres_url: Optional[str] = None  # For Vercel Postgres
+    postgres_database_url: Optional[str] = None  # Alternative name
+    neon_database_url: Optional[str] = None  # For Neon
     
     @property
     def effective_database_url(self) -> str:
         """Get the effective database URL, preferring PostgreSQL if available."""
-        if self.postgres_url:
-            return self.postgres_url
+        # Try multiple possible PostgreSQL environment variable names
+        postgres_urls = [
+            self.postgres_url,
+            self.postgres_database_url, 
+            self.neon_database_url,
+            os.getenv('POSTGRES_URL'),
+            os.getenv('POSTGRES_DATABASE_URL'),
+            os.getenv('NEON_DATABASE_URL'),
+            os.getenv('DATABASE_URL')  # Some services use this for PostgreSQL
+        ]
+        
+        for url in postgres_urls:
+            if url and ('postgresql://' in url or 'postgres://' in url):
+                return url
+                
+        # Fallback to SQLite (for local development)
         return self.database_url
     
     # Security

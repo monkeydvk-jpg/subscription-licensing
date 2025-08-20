@@ -6,9 +6,15 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 from .config import settings
+import logging
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 # Get the effective database URL
 DATABASE_URL = settings.effective_database_url
+logger.info(f"🗄️ Using database URL: {DATABASE_URL[:50]}{'...' if len(DATABASE_URL) > 50 else ''}")
+logger.info(f"🔍 Database type: {'PostgreSQL' if 'postgres' in DATABASE_URL else 'SQLite'}")
 
 # Create database engine
 engine = create_engine(
