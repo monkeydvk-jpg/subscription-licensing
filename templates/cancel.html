@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Cancelled - {{ app_name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .cancel-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            display: flex;
+            align-items: center;
+        }
+        .cancel-card {
+            background: white;
+            border-radius: 15px;
+            padding: 50px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .cancel-icon {
+            font-size: 5rem;
+            color: #ffc107;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cancel-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="cancel-card">
+                        <i class="fas fa-times-circle cancel-icon"></i>
+                        <h1 class="mb-4">Payment Cancelled</h1>
+                        <p class="lead mb-4">
+                            Your payment was cancelled. No charges have been made to your account.
+                        </p>
+                        
+                        <div class="mb-4">
+                            <h5><i class="fas fa-info-circle"></i> What you can do:</h5>
+                            <ul class="list-unstyled text-start">
+                                <li><i class="fas fa-redo text-primary"></i> Try the payment process again</li>
+                                <li><i class="fas fa-envelope text-primary"></i> Contact support if you need help</li>
+                                <li><i class="fas fa-home text-primary"></i> Return to our homepage</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <a href="/" class="btn btn-primary btn-lg">
+                                <i class="fas fa-home"></i> Return to Home
+                            </a>
+                            <a href="#" class="btn btn-outline-primary">
+                                <i class="fas fa-credit-card"></i> Try Again
+                            </a>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <small class="text-muted">
+                                Questions? Our support team is here to help.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

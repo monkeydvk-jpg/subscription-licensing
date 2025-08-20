@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            width: 350px;
+            min-height: 400px;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            font-size: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+        .header .subtitle {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .status-valid {
+            border-left: 4px solid #4CAF50;
+        }
+        .status-invalid {
+            border-left: 4px solid #F44336;
+        }
+        .status-icon {
+            font-size: 18px;
+            margin-right: 10px;
+        }
+        .status-text {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .status-details {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            box-sizing: border-box;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #45a049;
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .btn-danger {
+            background: #F44336;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #da190b;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .alert {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 12px;
+        }
+        .alert-success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4CAF50;
+        }
+        .alert-error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid #F44336;
+        }
+        .hidden {
+            display: none;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 2px solid #ffffff;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .links {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .links a {
+            color: white;
+            text-decoration: none;
+            font-size: 12px;
+            margin: 0 10px;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>🔑 Licensed Extension</h2>
+            <div class="subtitle">Subscription-based licensing</div>
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading license status...</p>
+        </div>
+        
+        <div id="content" class="hidden">
+            <div id="status-section">
+                <div id="status-card" class="status-card">
+                    <div id="status-content"></div>
+                </div>
+            </div>
+            
+            <div id="alert-container"></div>
+            
+            <div id="license-form-section">
+                <div class="form-group">
+                    <label for="license-key">License Key:</label>
+                    <input 
+                        type="text" 
+                        id="license-key" 
+                        class="form-control" 
+                        placeholder="Enter your license key..."
+                        maxlength="32"
+                    >
+                </div>
+                
+                <button id="activate-btn" class="btn btn-primary">
+                    Activate License
+                </button>
+            </div>
+            
+            <div id="license-actions-section" class="hidden">
+                <button id="revalidate-btn" class="btn btn-secondary">
+                    Check License Status
+                </button>
+                
+                <button id="deactivate-btn" class="btn btn-danger">
+                    Deactivate License
+                </button>
+            </div>
+            
+            <div class="links">
+                <a href="https://your-license-server.com" target="_blank">Get License</a>
+                <a href="https://your-license-server.com/support" target="_blank">Support</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+# Web Framework
+fastapi==0.109.2
+uvicorn[standard]==0.27.1
+gunicorn==21.2.0
+a2wsgi==1.8.0
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.9
+
+# Database
+sqlalchemy==2.0.28
+alembic==1.13.1
+
+# Payment Processing
+stripe==8.10.0
+
+# Data Validation
+pydantic[email]==2.6.3
+pydantic-settings==2.2.1
+
+# HTTP Client
+httpx==0.27.0
+requests==2.31.0
+
+# Template Engine
+jinja2==3.1.3
+
+# Environment Management
+python-decouple==3.8
+
+# Additional Utilities
+email-validator==2.1.1
+cryptography==42.0.5
+python-dateutil==2.9.0
+
+# Development Dependencies (optional)
+pytest==8.1.0
+pytest-asyncio==0.23.5
+
+# Database Drivers (choose based on your database)
+# PostgreSQL
+psycopg2-binary==2.9.9
+# MySQL (optional)
+# pymysql==1.1.0

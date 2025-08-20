@@ -1,0 +1,38 @@
+{
+    "manifest_version": 3,
+    "name": "Licensed Extension Example",
+    "version": "1.0.0",
+    "description": "Example Chrome extension with subscription-based licensing",
+    
+    "permissions": [
+        "storage",
+        "activeTab"
+    ],
+    
+    "host_permissions": [
+        "https://your-license-server.com/*"
+    ],
+    
+    "background": {
+        "service_worker": "background.js"
+    },
+    
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["content.js"],
+            "run_at": "document_end"
+        }
+    ],
+    
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "Licensed Extension"
+    },
+    
+    "icons": {
+        "16": "icon16.png",
+        "48": "icon48.png",
+        "128": "icon128.png"
+    }
+}
