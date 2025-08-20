@@ -44,14 +44,18 @@ class Settings(BaseSettings):
         # Try explicit URLs first
         for url in explicit_urls:
             if url and ('postgresql://' in url or 'postgres://' in url):
-                print(f"✅ Using explicit PostgreSQL URL: {url[:50]}...")
-                return url
+                # Normalize postgres:// to postgresql:// for SQLAlchemy compatibility
+                normalized_url = url.replace('postgres://', 'postgresql://', 1)
+                print(f"✅ Using explicit PostgreSQL URL: {normalized_url[:50]}...")
+                return normalized_url
         
         # Then try any PostgreSQL URL we found
         if postgres_candidates:
             selected_key, selected_url = postgres_candidates[0]  # Use the first one found
-            print(f"✅ Using found PostgreSQL URL from {selected_key}: {selected_url[:50]}...")
-            return selected_url
+            # Normalize postgres:// to postgresql:// for SQLAlchemy compatibility
+            normalized_url = selected_url.replace('postgres://', 'postgresql://', 1)
+            print(f"✅ Using found PostgreSQL URL from {selected_key}: {normalized_url[:50]}...")
+            return normalized_url
                 
         # Fallback to SQLite (for local development)
         print("⚠️ No PostgreSQL URL found, falling back to SQLite")
