@@ -91,13 +91,17 @@ def initialize_database():
     except Exception as e:
         logger.error(f"❌ Database connection failed: {e}")
         
-        # If PostgreSQL was attempted, don't fall back to SQLite in production
+        # If PostgreSQL was attempted, provide detailed error info but still allow app to start
         if 'postgres' in database_url:
-            logger.error("💥 PostgreSQL connection failed - NOT falling back to SQLite in production")
+            logger.error("💥 PostgreSQL connection failed")
+            logger.error(f"🔧 Connection error details: {str(e)}")
             logger.error("🔧 Please check your PostgreSQL environment variables and connection string")
-            raise Exception(f"PostgreSQL connection failed: {e}")
+            
+            # In production, fall back to SQLite temporarily to allow debugging
+            logger.warning("🚨 EMERGENCY FALLBACK: Using SQLite to allow app to start for debugging")
+            logger.warning("🚨 This will cause write operation errors - fix PostgreSQL connection ASAP")
         
-        # Only fall back to SQLite for local development
+        # Fall back to SQLite to allow the app to start
         logger.info("🔄 Falling back to SQLite (THIS WILL CAUSE WRITE ERRORS IN PRODUCTION)")
         
         fallback_url = "sqlite:///./subscriptions.db"
