@@ -39,16 +39,31 @@ def initialize_database():
     logger.info(f"🔍 Database type: {'PostgreSQL' if 'postgres' in database_url else 'SQLite'}")
     
     # Debug: Print all environment variables that start with DATABASE or POSTGRES
+    postgres_env_vars = {}
     for key, value in os.environ.items():
         if any(prefix in key.upper() for prefix in ['DATABASE', 'POSTGRES']):
-            logger.info(f"🔍 Found env var: {key} = {value[:50]}{'...' if len(value) > 50 else ''}")
+            postgres_env_vars[key] = value[:50] + ('...' if len(value) > 50 else '')
+            
+    if postgres_env_vars:
+        logger.info(f"🔍 PostgreSQL environment variables: {postgres_env_vars}")
+    else:
+        logger.warning("⚠️ No PostgreSQL environment variables found!")
     
     try:
-        # Create engine
-        engine = create_engine(
-            database_url,
-            connect_args={"check_same_thread": False} if "sqlite" in database_url else {}
-        )
+        # Create engine with connection pooling for PostgreSQL
+        if 'postgres' in database_url:
+            engine = create_engine(
+                database_url,
+                pool_size=5,
+                max_overflow=10,
+                pool_pre_ping=True,  # Verify connections before use
+                pool_recycle=300  # Recycle connections every 5 minutes
+            )
+        else:
+            engine = create_engine(
+                database_url,
+                connect_args={"check_same_thread": False}
+            )
         
         # Test the connection
         with engine.connect() as conn:
@@ -58,13 +73,33 @@ def initialize_database():
                 result = conn.execute(text("SELECT version()"))
                 version = result.fetchone()[0]
                 logger.info(f"📊 PostgreSQL version: {version[:100]}")
+                
+                # Check if tables exist
+                result = conn.execute(text("""
+                    SELECT table_name 
+                    FROM information_schema.tables 
+                    WHERE table_schema = 'public'
+                """))
+                tables = [row[0] for row in result]
+                if tables:
+                    logger.info(f"📋 Existing tables: {', '.join(tables)}")
+                else:
+                    logger.info("📋 Database is empty - tables will be created")
+                    
             return engine
             
     except Exception as e:
         logger.error(f"❌ Database connection failed: {e}")
+        
+        # If PostgreSQL was attempted, don't fall back to SQLite in production
+        if 'postgres' in database_url:
+            logger.error("💥 PostgreSQL connection failed - NOT falling back to SQLite in production")
+            logger.error("🔧 Please check your PostgreSQL environment variables and connection string")
+            raise Exception(f"PostgreSQL connection failed: {e}")
+        
+        # Only fall back to SQLite for local development
         logger.info("🔄 Falling back to SQLite (THIS WILL CAUSE WRITE ERRORS IN PRODUCTION)")
         
-        # Fallback to SQLite
         fallback_url = "sqlite:///./subscriptions.db"
         try:
             engine = create_engine(

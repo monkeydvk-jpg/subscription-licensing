@@ -16,37 +16,45 @@ class Settings(BaseSettings):
     @property
     def effective_database_url(self) -> str:
         """Get the effective database URL, preferring PostgreSQL if available."""
-        # Try multiple possible PostgreSQL environment variable names
-        postgres_urls = [
+        # Get ALL environment variables that might contain a PostgreSQL URL
+        all_env_vars = list(os.environ.items())
+        postgres_candidates = []
+        
+        # First, try explicit settings
+        explicit_urls = [
             self.postgres_url,
             self.postgres_database_url, 
             self.neon_database_url,
             os.getenv('POSTGRES_URL'),
             os.getenv('POSTGRES_DATABASE_URL'),
             os.getenv('NEON_DATABASE_URL'),
-            os.getenv('DATABASE_URL'),  # Some services use this for PostgreSQL
-            # Vercel Postgres often creates variables with DATABASE_URL_ prefix
-            os.getenv('DATABASE_URL_POSTGRES_URL'),
-            os.getenv('DATABASE_URL_DATABASE_URL'),
-            os.getenv('DATABASE_URL_POSTGRES_PRISMA_URL'),
-            os.getenv('DATABASE_URL_POSTGRES_URL_NON_POOLING')
+            os.getenv('DATABASE_URL'),
         ]
         
-        # Debug: Print what we found
-        for i, url in enumerate(postgres_urls):
-            if url:
-                var_names = [
-                    'postgres_url', 'postgres_database_url', 'neon_database_url',
-                    'POSTGRES_URL', 'POSTGRES_DATABASE_URL', 'NEON_DATABASE_URL', 'DATABASE_URL',
-                    'DATABASE_URL_POSTGRES_URL', 'DATABASE_URL_DATABASE_URL', 'DATABASE_URL_POSTGRES_PRISMA_URL', 'DATABASE_URL_POSTGRES_URL_NON_POOLING'
-                ]
-                print(f"🔍 Found {var_names[i]}: {url[:50]}{'...' if len(url) > 50 else ''}")
+        # Then scan ALL environment variables for PostgreSQL URLs
+        for key, value in all_env_vars:
+            if value and ('postgresql://' in value or 'postgres://' in value):
+                postgres_candidates.append((key, value))
         
-        for url in postgres_urls:
+        # Debug: Print what we found
+        print(f"🔍 Found {len(postgres_candidates)} PostgreSQL URL candidates:")
+        for key, url in postgres_candidates:
+            print(f"  {key}: {url[:50]}{'...' if len(url) > 50 else ''}")
+        
+        # Try explicit URLs first
+        for url in explicit_urls:
             if url and ('postgresql://' in url or 'postgres://' in url):
+                print(f"✅ Using explicit PostgreSQL URL: {url[:50]}...")
                 return url
+        
+        # Then try any PostgreSQL URL we found
+        if postgres_candidates:
+            selected_key, selected_url = postgres_candidates[0]  # Use the first one found
+            print(f"✅ Using found PostgreSQL URL from {selected_key}: {selected_url[:50]}...")
+            return selected_url
                 
         # Fallback to SQLite (for local development)
+        print("⚠️ No PostgreSQL URL found, falling back to SQLite")
         return self.database_url
     
     # Security
