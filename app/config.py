@@ -24,8 +24,23 @@ class Settings(BaseSettings):
             os.getenv('POSTGRES_URL'),
             os.getenv('POSTGRES_DATABASE_URL'),
             os.getenv('NEON_DATABASE_URL'),
-            os.getenv('DATABASE_URL')  # Some services use this for PostgreSQL
+            os.getenv('DATABASE_URL'),  # Some services use this for PostgreSQL
+            # Vercel Postgres often creates variables with DATABASE_URL_ prefix
+            os.getenv('DATABASE_URL_POSTGRES_URL'),
+            os.getenv('DATABASE_URL_DATABASE_URL'),
+            os.getenv('DATABASE_URL_POSTGRES_PRISMA_URL'),
+            os.getenv('DATABASE_URL_POSTGRES_URL_NON_POOLING')
         ]
+        
+        # Debug: Print what we found
+        for i, url in enumerate(postgres_urls):
+            if url:
+                var_names = [
+                    'postgres_url', 'postgres_database_url', 'neon_database_url',
+                    'POSTGRES_URL', 'POSTGRES_DATABASE_URL', 'NEON_DATABASE_URL', 'DATABASE_URL',
+                    'DATABASE_URL_POSTGRES_URL', 'DATABASE_URL_DATABASE_URL', 'DATABASE_URL_POSTGRES_PRISMA_URL', 'DATABASE_URL_POSTGRES_URL_NON_POOLING'
+                ]
+                print(f"🔍 Found {var_names[i]}: {url[:50]}{'...' if len(url) > 50 else ''}")
         
         for url in postgres_urls:
             if url and ('postgresql://' in url or 'postgres://' in url):
