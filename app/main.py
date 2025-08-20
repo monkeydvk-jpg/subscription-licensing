@@ -167,16 +167,62 @@ async def debug_db_env():
     db_type = "PostgreSQL" if "postgres" in db_url else "SQLite"
     
     env_vars = {
-        key: value
+        key: value[:50] + ("..." if len(value) > 50 else "")
         for key, value in os.environ.items()
         if key.upper().startswith(("DATABASE", "POSTGRES"))
     }
     
     return {
-        "effective_database_url": db_url,
+        "effective_database_url": db_url[:50] + ("..." if len(db_url) > 50 else ""),
         "database_type": db_type,
         "environment_variables": env_vars,
     }
+
+
+@app.post("/api/debug/reset-db")
+async def reset_database():
+    """Force database initialization (DANGEROUS - USE ONLY FOR DEBUGGING)."""
+    try:
+        from .database import get_engine
+        from .models import Base, AdminUser
+        from .security import get_password_hash
+        from sqlalchemy.orm import sessionmaker
+        
+        # Get fresh engine
+        engine = get_engine()
+        
+        # Drop and recreate all tables
+        Base.metadata.drop_all(bind=engine)
+        Base.metadata.create_all(bind=engine)
+        
+        # Create admin user
+        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+        db = SessionLocal()
+        
+        try:
+            admin_user = AdminUser(
+                username=settings.admin_username,
+                hashed_password=get_password_hash(settings.admin_password),
+                is_active=True
+            )
+            db.add(admin_user)
+            db.commit()
+        finally:
+            db.close()
+        
+        return {
+            "success": True,
+            "message": "Database reset completed",
+            "database_type": "PostgreSQL" if "postgres" in settings.effective_database_url else "SQLite"
+        }
+        
+    except Exception as e:
+        logger.error(f"Database reset failed: {e}")
+        return {
+            "success": False,
+            "error": str(e),
+            "message": "Database reset failed"
+        }
 
 
 # Admin Authentication
