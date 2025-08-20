@@ -40,7 +40,8 @@ pytest==8.1.0
 pytest-asyncio==0.23.5
 
 # Database Drivers (choose based on your database)
-# PostgreSQL
+# PostgreSQL - using asyncpg for better serverless compatibility
+asyncpg==0.29.0
 psycopg2-binary==2.9.9
 # MySQL (optional)
 # pymysql==1.1.0
