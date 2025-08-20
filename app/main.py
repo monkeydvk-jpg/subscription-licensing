@@ -231,6 +231,64 @@ async def reset_database():
         }
 
 
+@app.get("/api/debug/admin-info")
+async def get_admin_info():
+    """Get admin user information for debugging."""
+    import os
+    try:
+        return {
+            "configured_username": settings.admin_username,
+            "configured_password": "***" + settings.admin_password[-2:] if len(settings.admin_password) > 2 else "***",
+            "password_length": len(settings.admin_password),
+            "admin_username_env": os.getenv('ADMIN_USERNAME', 'not_set'),
+            "admin_password_env": "***" + (os.getenv('ADMIN_PASSWORD', '')[-2:] if os.getenv('ADMIN_PASSWORD') and len(os.getenv('ADMIN_PASSWORD')) > 2 else 'not_set')
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.post("/api/debug/reset-admin")
+async def reset_admin_user():
+    """Reset admin user with default credentials."""
+    try:
+        from .models import AdminUser
+        from .security import get_password_hash
+        
+        db = next(get_db())
+        try:
+            # Delete existing admin user
+            existing_admin = db.query(AdminUser).filter(AdminUser.username == "admin").first()
+            if existing_admin:
+                db.delete(existing_admin)
+                db.commit()
+            
+            # Create new admin user with hardcoded credentials
+            admin_user = AdminUser(
+                username="admin",
+                hashed_password=get_password_hash("changeme"),
+                is_active=True
+            )
+            db.add(admin_user)
+            db.commit()
+            
+            return {
+                "success": True,
+                "message": "Admin user reset to admin/changeme",
+                "username": "admin",
+                "password": "changeme"
+            }
+        finally:
+            db.close()
+            
+    except Exception as e:
+        logger.error(f"Admin user reset failed: {e}")
+        return {
+            "success": False,
+            "error": str(e),
+            "message": "Admin user reset failed"
+        }
+
+
 # Admin Authentication
 @app.post("/api/admin/login", response_model=Token)
 async def admin_login(
