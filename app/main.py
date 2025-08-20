@@ -608,6 +608,44 @@ async def rotate_license_key(
         raise HTTPException(status_code=500, detail="Failed to rotate license key")
 
 
+@app.delete("/api/admin/licenses/{license_id}")
+async def delete_license(
+    license_id: int,
+    current_user: AdminUser = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Delete a license permanently."""
+    try:
+        # Find the license
+        license = db.query(License).filter(License.id == license_id).first()
+        
+        if not license:
+            raise HTTPException(status_code=404, detail="License not found")
+        
+        # Get user info for the response
+        user_email = license.user.email if license.user else "unknown"
+        license_key_masked = mask_license_key(license.license_key)
+        
+        # Delete the license
+        db.delete(license)
+        db.commit()
+        
+        logger.info(f"License {license_id} deleted by admin {current_user.username}")
+        
+        return {
+            "success": True,
+            "message": f"License {license_key_masked} for {user_email} has been deleted",
+            "deleted_license_id": license_id,
+            "user_email": user_email
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting license {license_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete license")
+
+
 # Subscription Management Endpoints
 @app.get("/api/admin/subscriptions")
 async def get_subscriptions(
